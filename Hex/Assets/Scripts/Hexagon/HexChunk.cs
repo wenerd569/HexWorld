@@ -38,7 +38,7 @@ public class HexChunk : MonoBehaviour
         currentHexCell.transform.parent = this.transform;
         currentHexCell.name = x.ToString() + y.ToString();
         currentHexCell.Height = _chunkTransform.position.y;
-        currentHexCell.Position = clellOfset;
+        currentHexCell.PositionInChunk = clellOfset;
         HexChunkData[x, y] = currentHexCell;
     }
 }

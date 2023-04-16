@@ -2,19 +2,43 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IWeapon
+public interface IAttack
 {
-    float Couldown { get; }
-    void Atack(Vector3 point);
+    public float Distance { get; set; }
+    public float Duration { get; set; }
+    public abstract void Attack();
 }
 
-public abstract class GeoWeapon : IWeapon
-{
-    public float Couldown { get; }
 
-    public  void Atack(Vector3 point)
+public class GeoAttack : ScriptableObject, IAttack
+{
+    public float Distance { get; set; }
+    public float Duration { get; set; }
+
+    public override void Attack()
     {
-        var atackDot = new HexPosition(point);
+
+    }
+}
+
+public class MleeAttack : ScriptableObject, IAttack
+{
+    public float Distance { get; set; }
+    public float Duration { get; set; }
+
+    public override void Attack()
+    {
+
+    }
+}
+
+public class ShootAttack : ScriptableObject, IAttack
+{
+    public float Distance { get; set; }
+    public float Duration { get; set; }
+
+    public override void Attack()
+    {
 
     }
 }

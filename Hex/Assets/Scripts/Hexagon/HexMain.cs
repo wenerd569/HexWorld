@@ -4,7 +4,7 @@ using System;
 
 public class HexMain : MonoBehaviour
 {
-    public static HexMain Instance;
+
     public Dictionary<Vector2Int, HexChunk> _chunks = new Dictionary<Vector2Int, HexChunk>();
 
     private Camera MainCamera;
@@ -15,7 +15,6 @@ public class HexMain : MonoBehaviour
 
     public void Awake()
     {
-        Instance =
         MainCamera = Camera.main;
     }
     public void Start()
@@ -37,7 +36,7 @@ public class HexMain : MonoBehaviour
                 var _selectCell = hit.collider.gameObject.GetComponent<HexCell>();
                 print(hitCoordinate);
                 print(calculateCellPosition.Chunk.ToString() + " : " + calculateCellPosition.CellInChunk.ToString());
-                print(_selectCell.Position);
+                print(_selectCell.PositionInChunk);
             }
         }
     }
