@@ -13,7 +13,7 @@ public class HexChunk : MonoBehaviour
     {
         _settings = HexMainSettings.Instance;
         _chunkTransform = transform;
-        HexChunkData = new HexChunkData(_settings);
+        HexChunkData = new HexChunkData(_settings.ChunkRadius);
         GenerateStandartPlane();
     }
 
@@ -38,7 +38,6 @@ public class HexChunk : MonoBehaviour
         currentHexCell.transform.parent = this.transform;
         currentHexCell.name = x.ToString() + y.ToString();
         currentHexCell.Height = _chunkTransform.position.y;
-        currentHexCell.PositionInChunk = clellOfset;
         HexChunkData[x, y] = currentHexCell;
     }
 }

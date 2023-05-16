@@ -4,41 +4,23 @@ using System;
 
 public class HexMain : MonoBehaviour
 {
+    public static HexMain Instance;
+    public Dictionary<Vector2Int, HexChunk> Chunks = new Dictionary<Vector2Int, HexChunk>();
 
-    public Dictionary<Vector2Int, HexChunk> _chunks = new Dictionary<Vector2Int, HexChunk>();
-
-    private Camera MainCamera;
-    [SerializeField] public HexChunk _standartChunk;
+    private Camera _mainCamera;
+    public HexChunk StandartChunk;
 
     [SerializeField] private LayerMask _hexLayer;
-    private HexCell _seleleciktCell;
+    private HexCell _selelectionCell;
 
     public void Awake()
     {
-        MainCamera = Camera.main;
+        Instance = this;
+        _mainCamera = Camera.main;
     }
     public void Start()
     {
         GenerateStandartMain(HexMainSettings.Instance.WorldRadius);
-    }
-
-    public void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            var ray = MainCamera.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out var hit, Mathf.Infinity, _hexLayer))
-            {
-                var hitCoordinate = hit.point;
-                var calculateCellPosition = new HexPosition();
-                calculateCellPosition.WorldCoordinate = hitCoordinate;
-                var _selectCell = hit.collider.gameObject.GetComponent<HexCell>();
-                print(hitCoordinate);
-                print(calculateCellPosition.Chunk.ToString() + " : " + calculateCellPosition.CellInChunk.ToString());
-                print(_selectCell.PositionInChunk);
-            }
-        }
     }
 
     private void GenerateStandartMain(int radius)
@@ -51,10 +33,10 @@ public class HexMain : MonoBehaviour
                 {
                     var locate = new Vector2Int(x, y);
                     var chunkOfset = x * HexMainSettings.Instance.ChunkBasis.x + y * HexMainSettings.Instance.ChunkBasis.y;
-                    var chunk = Instantiate(_standartChunk, new Vector3(chunkOfset.x, 0, chunkOfset.y), Quaternion.identity);
+                    var chunk = Instantiate(StandartChunk, new Vector3(chunkOfset.x, 0, chunkOfset.y), Quaternion.identity);
                     chunk.transform.parent = this.transform;
                     chunk.name = locate.ToString();
-                    _chunks.Add(locate, chunk);
+                    Chunks.Add(locate, chunk);
                 }
             }
         }

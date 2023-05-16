@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,7 +8,7 @@ public class Transform2D
     public Vector2 y;
 }
 
-public class HexRotation
+public class HexRotation //...хуйня
 {
     public static readonly Quaternion Right = new Quaternion(-0.707106829f, 0, 0, 0.707106829f);
     public static readonly Quaternion downRight = new Quaternion(0.612372398f, -0.353553504f, -0.353553504f, -0.612372398f);
@@ -25,7 +24,8 @@ public class HexRotation
     }
 }
 
-public class HexPosition
+
+public class HexPosition // скорее всего слишком медленный код, переделай (потом)
 {
     private Vector2 _worldCoordinate;
     private Vector2Int _chunk;
@@ -33,6 +33,7 @@ public class HexPosition
     private Vector2Int _cellInWorld;
     private HexMainSettings _settings;
 
+    #region Initialize Coordinate
     public HexPosition()
     {
         _settings = HexMainSettings.Instance;
@@ -44,7 +45,7 @@ public class HexPosition
         RecalculateAllCoordinate(point);
     }
 
-    public Vector3 WorldCoordinate // Vector3 тут только для удобства передачи
+    public Vector3 WorldCoordinate
     {
         get { return new Vector3(_worldCoordinate.x, 0, _worldCoordinate.y); }
         set
@@ -80,7 +81,8 @@ public class HexPosition
             RecalculateAllCoordinate(_worldCoordinate + ConvertCoordinate(celldelta, _settings.HexBasis));
         }
     }
-
+    #endregion
+    #region Calculate Coordinate
     public void RecalculateAllCoordinate(Vector2 worldCoordinate)
     {
         _worldCoordinate = worldCoordinate;
@@ -128,4 +130,28 @@ public class HexPosition
         }
         return new Vector2Int(rX, rY);
     }
+    #endregion
+    #region Additional Functions
+    public static HexChunkData GetAllHexCellInArea(HexPosition hexPosition, int radius)
+    {
+        var hexArea = new HexChunkData(radius);
+
+        var tempHexPosition = new HexPosition(); 
+        for (int x  = 0; x < radius; x++)
+        {
+            for (int y = 0; y < radius; y++)
+            {
+                if (Math.Abs(x + y) <= radius)
+                {
+                    tempHexPosition.CellInWorld = hexPosition.CellInWorld + new Vector2Int(x, y);
+                    hexArea[x, y] = HexMain.Instance.Chunks[tempHexPosition.Chunk].HexChunkData[tempHexPosition.CellInChunk.x, tempHexPosition.CellInChunk.y];
+                }
+            }
+        }
+        return hexArea;
+    }
+
+
+
+    #endregion
 }
