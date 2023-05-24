@@ -6,22 +6,77 @@ public class HexMain : MonoBehaviour
 {
     public static HexMain Instance;
     public Dictionary<Vector2Int, HexChunk> Chunks = new Dictionary<Vector2Int, HexChunk>();
+    public MonoBehaviour Player;
 
-    private Camera _mainCamera;
+    private HexMainSettings _settings;
+
+
     public HexChunk StandartChunk;
-
-    [SerializeField] private LayerMask _hexLayer;
-    private HexCell _selelectionCell;
 
     public void Awake()
     {
         Instance = this;
-        _mainCamera = Camera.main;
+        _settings = HexMainSettings.Instance;
     }
     public void Start()
     {
-        GenerateStandartMain(HexMainSettings.Instance.WorldRadius);
+        GenerateStandartMain(_settings.WorldLoadRadius);
     }
+
+    public void Update()
+    {
+        UpdateChunksLoadetArea();
+
+        ChunkPhisicIteration();
+    }
+
+    private void UpdateChunksLoadetArea()
+    {
+        var simulateDistantion = _settings.ChunkSize * _settings.WorldSimulateRadius;
+        var loadDistantion = _settings.ChunkSize * _settings.WorldLoadRadius;
+
+        var chunkPosition = new HexPosition(transform.position);
+        var playerPosition = new HexPosition(Player.transform.position);
+
+        var deletedList = new List<Vector2Int>();
+        foreach (var chunk in Chunks)
+        {
+            chunkPosition.Chunk = chunk.Key;
+            var distantion = (playerPosition.CellInWorld - chunkPosition.CellInWorld).magnitude;
+            if (distantion > loadDistantion)
+            {
+                deletedList.Add(chunk.Key);
+            }
+            else if (distantion > simulateDistantion)
+            {
+                chunk.Value.IsSimulate = false;
+            }
+            else
+            {
+                chunk.Value.IsSimulate = true;
+            }
+        }
+    }
+
+    private void ChunkPhisicIteration()
+    {
+        foreach (var chunk in Chunks)
+        {
+            if (chunk.Value.IsSimulate)
+            {
+                chunk.Value.PrepairCalcForces();
+                chunk.Value.CalcForces();
+            }
+        }
+        foreach (var chunk in Chunks)
+        {
+            if (chunk.Value.IsSimulate)
+            {
+                chunk.Value.CalcHeights();
+            }
+        }
+    }
+
 
     private void GenerateStandartMain(int radius)
     {
@@ -32,7 +87,7 @@ public class HexMain : MonoBehaviour
                 if (Math.Abs(x + y) <= radius)
                 {
                     var locate = new Vector2Int(x, y);
-                    var chunkOfset = x * HexMainSettings.Instance.ChunkBasis.x + y * HexMainSettings.Instance.ChunkBasis.y;
+                    var chunkOfset = (x * _settings.HexBasis.x * _settings.ChunkSize) + (y * _settings.HexBasis.y * _settings.ChunkSize);
                     var chunk = Instantiate(StandartChunk, new Vector3(chunkOfset.x, 0, chunkOfset.y), Quaternion.identity);
                     chunk.transform.parent = this.transform;
                     chunk.name = locate.ToString();

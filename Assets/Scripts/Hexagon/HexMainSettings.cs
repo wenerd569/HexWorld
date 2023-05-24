@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Hex/_settings")]
@@ -14,20 +12,29 @@ public class HexMainSettings : ScriptableObject
     }
 
     [SerializeField] private int _hexSize;
-    [SerializeField] private int _chunckRadius;
-    [SerializeField] private int _worldRadius;
+    [SerializeField] private int _chunckSize;
+    [SerializeField] private int _worldSimulateRadius;
+    [SerializeField] private int _worldLoadedRadius;
 
-    public int HexSize { get; private set; }
-    public int ChunkRadius { get; private set; }
-    public int ChunkDiametr { get; private set; }
-    public int WorldRadius { get; private set; }
+    public int HexSize
+    {
+        get { return _chunckSize; }
+    }
+    public int ChunkSize
+    {
+        get { return _chunckSize; }
+    }
+    public int WorldSimulateRadius
+    {
+        get { return _worldSimulateRadius; }
+    }
+    public int WorldLoadRadius
+    {
+        get { return _worldLoadedRadius; }
+    }
 
     public Transform2D HexBasis { get; private set; }
     public Transform2D InvertHexBasis { get; private set; }
-    public Transform2D ChunkInHexBasis { get; private set; }
-    public Transform2D InvertChunkInHexBasis { get; private set; }
-    public Transform2D ChunkBasis { get; private set; }
-    public Transform2D InvertChunkBasis { get; private set; }
 
     public Quaternion UnityStupidRotationFix { get; private set; }
     public Vector3 UnityStupidScaleFix { get; private set; }
@@ -37,19 +44,9 @@ public class HexMainSettings : ScriptableObject
     {
         UnityStupidRotationFix = new Quaternion(-0.707106829f, 0, 0, 0.707106829f);
         UnityStupidScaleFix = new Vector3(100, 100, 100);
-        HexSize = _hexSize;
-        ChunkRadius = _chunckRadius;
-        WorldRadius = _worldRadius;
-        ChunkDiametr = ChunkRadius * 2 + 1;
 
         HexBasis = CalculateHexBasis(HexSize);
         InvertHexBasis = InvertBasis(HexBasis);
-
-        ChunkInHexBasis = CalculateChunkInHexBasis(ChunkRadius);
-        InvertChunkInHexBasis = InvertBasis(ChunkInHexBasis);
-
-        ChunkBasis = CalculateChunkBasis(HexBasis, ChunkInHexBasis);
-        InvertChunkBasis = InvertBasis(ChunkBasis);
     }
 
     private static Transform2D CalculateHexBasis(float hexSize)
@@ -90,19 +87,5 @@ public class HexMainSettings : ScriptableObject
         result.x.y = (float)(-basis.x.y * idet);
         result.y.x = (float)(-basis.y.x * idet);
         return result;
-    }
-    private static Transform2D CalculateChunkBasis(Transform2D hexBasis, Transform2D chunckInHexBasis)
-    {
-        var chunkBasis = new Transform2D();
-        chunkBasis.x = hexBasis.x * chunckInHexBasis.x.x + hexBasis.y * chunckInHexBasis.x.y;
-        chunkBasis.y = hexBasis.x * chunckInHexBasis.y.x + hexBasis.y * chunckInHexBasis.y.y;
-        return chunkBasis;
-    }
-    private static Transform2D CalculateChunkInHexBasis(int chunkRadius)
-    {
-        var chunkInHexBasis = new Transform2D();
-        chunkInHexBasis.x = new Vector2(chunkRadius * 2 + 1, -chunkRadius);
-        chunkInHexBasis.y = new Vector2(chunkRadius, chunkRadius + 1);
-        return chunkInHexBasis;
     }
 }

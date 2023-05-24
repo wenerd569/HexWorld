@@ -1,14 +1,26 @@
 using UnityEngine;
 
-[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter), typeof(Material))]
-public abstract class HexCell : MonoBehaviour
+[RequireComponent(typeof(MeshRenderer))]
+public class HexCell : MonoBehaviour
 {
-	[SerializeField] protected float startHeight = 0;
-	[SerializeField] protected float mass = 0;
-	[SerializeField] protected float springRate = 0;
-	[SerializeField] protected float friction—oefficient = 0;
-    protected float speed = 0;
-    protected float cerrentHeight = 0;
-	protected float force = 0;
+    public struct Hex
+    {
+        public float StartHeight;
+        public float SpringRate;
+        public float Mass;
+        public float Friction—oefficient;
+    }
 
+
+    public HexPhisicMaterial PhisicMaterial;
+    public float StartHeight;
+
+    [HideInInspector] public float Speed = 0;
+	[HideInInspector] public float Force = 0;
+
+    public HexCell(float height, HexPhisicMaterial phisicMaterial)
+    {
+        StartHeight = height;
+        PhisicMaterial = phisicMaterial;
+    }
 }

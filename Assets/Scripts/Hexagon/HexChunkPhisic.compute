@@ -1,0 +1,62 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CalcForces, CalcHeights;
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+struct Hex
+{
+    float StartHeight;
+    float SpringRate;
+    float Mass;
+    float Friction—oefficient;
+};
+
+StructuredBuffer<Hex> Hexes; // + 2
+
+RWStructuredBuffer<float> Heights; // + 2
+RWStructuredBuffer<float> Speeds;
+RWStructuredBuffer<float> Forces;
+
+uint ChunkSize;
+float GlobalSpeed—oefficient; // 0 < x < 1
+
+
+
+float3x3 WeightMatrix =
+{
+    0f, 1f, 1f,
+    1f, 1f, 1f,
+    1f, 1f, 0f
+};
+
+[numthreads(8,8,1)]
+void CalcForces(uint3 id : SV_DispatchThreadID)
+{
+    uint fId = id.x * ChunkSize + id.y;
+    uint hId = hId + ChunkSize + 3 + id.x * 2;
+    float forces = Forces[fId];
+    
+    for (uint i = -1; i <= 1; i++)
+    {
+        for (uint j = -1; j <= 1; j++)
+        {
+            uint lHId = hId + i * (ChunkSize + 2) + j;
+            
+            forces += (Hexes[lHId].StartHeight - Height[lHId]) * Hexes[lHId].SpringRate * WeightMatrix[i+1, j+1];
+        }
+    }
+    
+    forces -= 9.8 * Hexes[hId].Mass;
+    Forces[fId] = forces;
+}
+
+[numthreads(8, 8, 1)]
+void CalcHeights(uint3 id : SV_DispatchThreadID)
+{
+    uint fId = id.x * ChunkSize + id.y;
+    uint hId = hId + ChunkSize + 3 + id.x * 2;
+    
+    Speeds[fId] += Forces[fId] / Hexes[hId].Mass;
+    
+    Heights[hId] += Speeds[fId] * GlobalSpeed—oefficient;
+}

@@ -27,79 +27,68 @@ public class HexRotation //...хуйня
 
 public class HexPosition // скорее всего слишком медленный код, переделай (потом)
 {
-    private Vector2 _worldCoordinate;
-    private Vector2Int _chunk;
-    private Vector2Int _cellInChunk;
     private Vector2Int _cellInWorld;
     private HexMainSettings _settings;
 
     #region Initialize Coordinate
-    public HexPosition()
-    {
-        _settings = HexMainSettings.Instance;
-    }
-
     public HexPosition(Vector3 point)
     {
         _settings = HexMainSettings.Instance;
-        RecalculateAllCoordinate(point);
+        WorldCoordinate = point;
     }
 
     public Vector3 WorldCoordinate
     {
-        get { return new Vector3(_worldCoordinate.x, 0, _worldCoordinate.y); }
+        get 
+        {
+            var worldCoordinate = ConvertCoordinate(_cellInWorld, _settings.HexBasis);
+            return new Vector3(worldCoordinate.x, 0, worldCoordinate.y);
+        }
         set
         {
-            RecalculateAllCoordinate(new Vector2(value.x, value.z));
+            _cellInWorld = RoundHex(ConvertCoordinate(value, _settings.InvertHexBasis));
         }
     }
 
     public Vector2Int Chunk
     {
-        get { return _chunk; }
+        get 
+        {
+            return _cellInWorld / _settings.ChunkSize;
+        }
         set
         {
-            var chunckDelta = _chunk - value;
-            RecalculateAllCoordinate(_worldCoordinate + ConvertCoordinate(chunckDelta, _settings.ChunkBasis));
+            var chunkDelta = value - Chunk;
+            _cellInWorld += chunkDelta * _settings.ChunkSize;
         }
     }
     public Vector2Int CellInChunk
     {
-        get { return _cellInChunk; }
+        get 
+        {
+            return new Vector2Int(_cellInWorld.x % _settings.ChunkSize, _cellInWorld.y % _settings.ChunkSize);
+        }
         set
         {
-            var celldelta = _cellInChunk - value;
-            RecalculateAllCoordinate(_worldCoordinate + ConvertCoordinate(celldelta, _settings.HexBasis));
+            var cellDelta = value - CellInChunk;
+            _cellInWorld += cellDelta;
         }
     }
     public Vector2Int CellInWorld
     {
-        get { return _cellInWorld; }
+        get 
+        {
+            return _cellInWorld;
+        }
         set
         {
-            var celldelta = _cellInWorld - value;
-            RecalculateAllCoordinate(_worldCoordinate + ConvertCoordinate(celldelta, _settings.HexBasis));
+            _cellInWorld = value;
         }
     }
     #endregion
+
+
     #region Calculate Coordinate
-    public void RecalculateAllCoordinate(Vector2 worldCoordinate)
-    {
-        _worldCoordinate = worldCoordinate;
-        _cellInWorld = RoundHex(ConvertCoordinate(worldCoordinate, _settings.InvertHexBasis));
-        _chunk = RoundHex(ConvertCoordinate(worldCoordinate, _settings.InvertChunkBasis));
-        _cellInChunk = CalculateCoordinateInChunck(_chunk, _cellInWorld);
-    }
-
-    private Vector2Int CalculateCoordinateInChunck(Vector2Int chunk, Vector2Int cellInWorld)
-    {
-        var result = new Vector2Int();
-        result = -RoundHex(ConvertCoordinate(chunk, _settings.ChunkInHexBasis));
-        result.x += cellInWorld.x;
-        result.y += cellInWorld.y;
-        return result;
-    }
-
     private Vector2 ConvertCoordinate(Vector2 locateInWorldCoordinate, Transform2D basis)
     {
         var locateInCellCoordinate = new Vector2();
@@ -131,8 +120,10 @@ public class HexPosition // скорее всего слишком медленный код, переделай (потом
         return new Vector2Int(rX, rY);
     }
     #endregion
+
+
     #region Additional Functions
-    public static HexChunkData GetAllHexCellInArea(HexPosition hexPosition, int radius)
+    /*public static HexChunkData GetAllHexCellInArea(HexPosition hexPosition, int radius)
     {
         var hexArea = new HexChunkData(radius);
 
@@ -149,9 +140,6 @@ public class HexPosition // скорее всего слишком медленный код, переделай (потом
             }
         }
         return hexArea;
-    }
-
-
-
+    }*/
     #endregion
 }

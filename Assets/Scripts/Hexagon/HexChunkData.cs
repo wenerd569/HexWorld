@@ -3,32 +3,22 @@ using UnityEngine;
 
 public class HexChunkData
 {
-    private HexCell[][] _hexCells;
-    public readonly int ChunkRadius;
-    public readonly int ChunkDiametr;
+    private HexCell[,] _hexCells;
 
-
-    public HexChunkData(int radius)
+    public HexChunkData(int size)
     {
-        ChunkRadius = radius;
-        ChunkDiametr = radius * 2 + 1;
-
-        _hexCells = new HexCell[ChunkDiametr][];
-        for (int x = 0; x < ChunkDiametr; x++)
-        {
-            _hexCells[x] = new HexCell[ChunkDiametr - Math.Abs(ChunkRadius - x)];
-        }
+        _hexCells = new HexCell[size, size];
     }
 
     public HexCell this[int x, int y]
     {
         get
         {
-            return _hexCells[x + ChunkRadius][y + ChunkRadius - Math.Max(0, -x)];
+            return _hexCells[x, y];
         }
         set
         {
-            _hexCells[x + ChunkRadius][y + ChunkRadius - Math.Max(0, -x)] = value;
+            _hexCells[x, y] = value;
         }
     }
 }
