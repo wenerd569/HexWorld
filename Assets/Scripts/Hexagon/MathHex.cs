@@ -28,12 +28,12 @@ public class HexRotation //...хуйня
 public class HexPosition // скорее всего слишком медленный код, переделай (потом)
 {
     private Vector2Int _cellInWorld;
-    private HexMainSettings _settings;
+    private MainSettings _settings;
 
     #region Initialize Coordinate
     public HexPosition(Vector3 point)
     {
-        _settings = HexMainSettings.Instance;
+        _settings = MainSettings.Instance;
         WorldCoordinate = point;
     }
 

@@ -2,21 +2,21 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 
-public class HexMain : MonoBehaviour
+public class Main : MonoBehaviour
 {
-    public static HexMain Instance;
-    public Dictionary<Vector2Int, HexChunk> Chunks = new Dictionary<Vector2Int, HexChunk>();
+    public static Main Instance;
+    public Dictionary<Vector2Int, MoveableChunk> Chunks = new Dictionary<Vector2Int, MoveableChunk>();
     public MonoBehaviour Player;
 
-    private HexMainSettings _settings;
+    private MainSettings _settings;
 
 
-    public HexChunk StandartChunk;
+    public ChunkMoveSistem StandartChunk;
 
     public void Awake()
     {
         Instance = this;
-        _settings = HexMainSettings.Instance;
+        _settings = MainSettings.Instance;
     }
     public void Start()
     {

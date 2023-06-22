@@ -2,9 +2,9 @@ using System;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Hex/_settings")]
-public class HexMainSettings : ScriptableObject
+public class MainSettings : ScriptableObject
 {   
-    public static HexMainSettings Instance { get; private set; }
+    public static MainSettings Instance { get; private set; }
 
     public void OnValidate()
     {

@@ -5,5 +5,5 @@ public abstract class HexPhisicMaterial : PhysicMaterial
 {
     public float SpringRate = 0;
     public float Mass = 0;
-    public float Friction—oefficient = 0;
+    public float FrictionCoefficient = 0;
 }
