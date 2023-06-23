@@ -4,7 +4,7 @@ using UnityEngine;
 public class CameraMan : MonoBehaviour
 {
     private Camera _mainCamera;
-    [Serialize] public IWeapon Weapon; 
+    public IWeapon Weapon; 
 
     private void Awake()
     {
@@ -13,7 +13,7 @@ public class CameraMan : MonoBehaviour
 
     public void Update()
     {
-        if (Input.GetMouseButtonDown(0) && Weapon.TryGetComponent<>)
+        if (Input.GetMouseButtonDown(0) && Weapon != null)
         {
             Weapon.Attack(this, _mainCamera.transform.forward); 
         }

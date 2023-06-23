@@ -12,10 +12,10 @@ public class GeoAttack : MonoBehaviour, IAttackType
     public void Target(GameObject targetObject, Vector3 targetPoint, Vector3 targetDirection, float forces)
     {
         var hexPosition = new HexPosition(targetPoint);
-        RegionTarget(hexPosition, forces, (int)AttackRadius, _targetShape);
+//        RegionTarget(hexPosition, forces, (int)AttackRadius, _targetShape);
     }
 
-    public static void RegionTarget(HexPosition hexPosition, float forces, int radius, AnimationCurve curve)
+/*    public static void RegionTarget(HexPosition hexPosition, float forces, int radius, AnimationCurve curve)
     {
         var hexArea = HexPosition.GetAllHexCellInArea(hexPosition, radius);
         for (int x = 0; x < radius; x++)
@@ -29,5 +29,5 @@ public class GeoAttack : MonoBehaviour, IAttackType
                 }
             }
         }
-    }
+    } */
 }

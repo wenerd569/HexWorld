@@ -4,6 +4,5 @@ using UnityEngine;
 
 public interface IChunk
 {
-    public ChunkData ChunkData { get; set; }
     public void SpawnPlane();
 }
