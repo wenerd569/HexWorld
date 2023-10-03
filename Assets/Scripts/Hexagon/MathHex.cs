@@ -6,47 +6,87 @@ public class Transform2D
 {
     public Vector2 x;
     public Vector2 y;
-}
 
-public class HexRotation //...хуйня
-{
-    public static readonly Quaternion Right = new Quaternion(-0.707106829f, 0, 0, 0.707106829f);
-    public static readonly Quaternion downRight = new Quaternion(0.612372398f, -0.353553504f, -0.353553504f, -0.612372398f);
-    public static readonly Quaternion downLeft = new Quaternion(0.353553414f, -0.612372458f, -0.612372458f, -0.353553414f);
-    public static readonly Quaternion Left = new Quaternion(0, -0.707106829f, -0.707106829f, 0);
-    public static readonly Quaternion upLeft = new Quaternion(-0.353553355f, -0.612372458f, -0.612372458f, 0.353553355f);
-    public static readonly Quaternion upRight = new Quaternion(-0.612372458f, -0.353553414f, -0.353553414f, 0.612372458f);
-    private Rotate _rotate;
 
-    public static Rotate TurnCounterClockWise(Rotate startAngle, int step)
+    public Transform2D()
     {
-        return new Rotate(startAngle.angle.value + (60 * step));
+        x = Vector2.zero;
+        y = Vector2.zero;
+    }
+
+    public Transform2D(Vector2 x, Vector2 y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
+    public static Transform2D CalculateHexBasis(float hexSize)
+    {
+        var gridBasis = CalculateGridBasis(hexSize);
+        var x = gridBasis.x * 2;
+        var y = gridBasis.x + gridBasis.y * 3;
+        var hexBasis = new Transform2D(x , y);
+        return hexBasis;
+    }
+
+    public static Transform2D CalculateGridBasis(float hexSize)
+    {
+        var x = new Vector2(CalculateShortSide(hexSize), 0);
+        var y = new Vector2(0, CalculateLongSide(hexSize));
+        var gridBasis = new Transform2D(x, y);
+        return gridBasis;
+    }
+
+    private static float CalculateShortSide(float hexSize)
+    {
+        var shortSide = (float)(hexSize * Math.Sqrt(3) / 2);
+        return shortSide;
+    }
+    private static float CalculateLongSide(float hexSize)
+    {
+        var longSide = hexSize / 2;
+        return longSide;
+    }
+
+    public static Transform2D InvertBasis(Transform2D basis)
+    {
+        var det = basis.x.x * basis.y.y - basis.y.x * basis.x.y;
+        var idet = 1.0 / det;
+
+        var result = new Transform2D();
+        result.x.x = (float)(basis.y.y * idet);
+        result.x.y = (float)(-basis.x.y * idet);
+        result.y.y = (float)(basis.x.x * idet);
+        result.y.x = (float)(-basis.y.x * idet);
+        return result;
     }
 }
 
-
 public class HexPosition // скорее всего слишком медленный код, переделай (потом)
 {
-    private Vector2Int _cellInWorld;
-    private MainSettings _settings;
+    private Vector2Int cellInWorld;
 
     #region Initialize Coordinate
     public HexPosition(Vector3 point)
     {
-        _settings = MainSettings.Instance;
         WorldCoordinate = point;
     }
+
+    public HexPosition(Vector2Int position)
+    {
+        CellInWorld = position;
+    }
+
 
     public Vector3 WorldCoordinate
     {
         get 
         {
-            var worldCoordinate = ConvertCoordinate(_cellInWorld, _settings.HexBasis);
-            return new Vector3(worldCoordinate.x, 0, worldCoordinate.y);
+            return ConvertToWorldCoordinate(cellInWorld);
         }
         set
         {
-            _cellInWorld = RoundHex(ConvertCoordinate(value, _settings.InvertHexBasis));
+            cellInWorld = ConvetrToHexPosition(value);
         }
     }
 
@@ -54,48 +94,70 @@ public class HexPosition // скорее всего слишком медленный код, переделай (потом
     {
         get 
         {
-            return _cellInWorld / _settings.ChunkSize;
+            return cellInWorld / ChunkSettings.ChunkSize;
         }
         set
         {
             var chunkDelta = value - Chunk;
-            _cellInWorld += chunkDelta * _settings.ChunkSize;
+            cellInWorld += chunkDelta * ChunkSettings.ChunkSize;
         }
     }
     public Vector2Int CellInChunk
     {
         get 
         {
-            return new Vector2Int(_cellInWorld.x % _settings.ChunkSize, _cellInWorld.y % _settings.ChunkSize);
+            return new Vector2Int(cellInWorld.x % ChunkSettings.ChunkSize, cellInWorld.y % ChunkSettings.ChunkSize);
         }
         set
         {
             var cellDelta = value - CellInChunk;
-            _cellInWorld += cellDelta;
+            cellInWorld += cellDelta;
         }
     }
     public Vector2Int CellInWorld
     {
         get 
         {
-            return _cellInWorld;
+            return cellInWorld;
         }
         set
         {
-            _cellInWorld = value;
+            cellInWorld = value;
+        }
+    }
+
+    public int ChunkIndex
+    {
+        get
+        {
+            var chunkPosition = CellInChunk;
+            return chunkPosition.x * ChunkSettings.ChunkSize + chunkPosition.y;
         }
     }
     #endregion
 
 
     #region Calculate Coordinate
-    private Vector2 ConvertCoordinate(Vector2 locateInWorldCoordinate, Transform2D basis)
+    public static Vector2Int ConvetrToHexPosition(Vector3 worldCoordinate)
+    {
+        return RoundHex(ConvertCoordinate(worldCoordinate, CellSettings.InvertHexBasis));
+    }
+    
+    public static Vector3 ConvertToWorldCoordinate(Vector2Int hexPosition)
+    {
+        var worldCoordinate = ConvertCoordinate(hexPosition, CellSettings.HexBasis);
+        return new Vector3(worldCoordinate.x, 0, worldCoordinate.y);
+    }
+    
+    
+    
+    public static Vector2 ConvertCoordinate(Vector2 coordinate, Transform2D basis)
     {
         var locateInCellCoordinate = new Vector2();
-        locateInCellCoordinate.x = locateInWorldCoordinate.x * basis.x.x +
-            locateInWorldCoordinate.y * basis.y.x;
-        locateInCellCoordinate.y = locateInWorldCoordinate.x * basis.x.y +
-            locateInWorldCoordinate.y * basis.y.y;
+        locateInCellCoordinate.x = coordinate.x * basis.x.x +
+            coordinate.y * basis.y.x;
+        locateInCellCoordinate.y = coordinate.x * basis.x.y +
+            coordinate.y * basis.y.y;
         return locateInCellCoordinate;
     }
 
