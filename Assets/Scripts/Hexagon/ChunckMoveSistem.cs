@@ -34,7 +34,6 @@ public class ChunkMoveSistem : ScriptableObject
 
             transform.position += new Vector3(0, Heights[hId], 0);
 
-            V
             SetHeight(0, 0, x, y);
             if (x == 0)
             {
@@ -163,7 +162,7 @@ public class ChunkMoveSistem : ScriptableObject
                     StartHeight = hex.StartHeight,
                     SpringRate = hex.PhisicMaterial.SpringRate,
                     Mass = hex.PhisicMaterial.Mass,
-                    Friction�oefficient = hex.PhisicMaterial.Friction�oefficient
+                    FrictionСoefficient = hex.PhisicMaterial.FrictionCoefficient,
                 };
                 Heights[id] = hex.transform.position.y;
             }
